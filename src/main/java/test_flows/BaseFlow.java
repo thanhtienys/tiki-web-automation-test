@@ -25,6 +25,13 @@ public class BaseFlow {
         homeFlow().clickBtnAccount();
     }
 
+    @Step("[HOME]Login success full by email")
+    public void loginSuccessFullByEmail(String email, String password) {
+        moveToLoginScreen();
+        loginFlow().moveToLoginByEmail();
+        loginFlow().inputEmailPasswordAndSubmit(email, password);
+    }
+
     public HomeFlow homeFlow() {
         return new HomeFlow(driver);
     }

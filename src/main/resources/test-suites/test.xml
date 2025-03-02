@@ -7,10 +7,4 @@
             <class name="test.LoginTest"/>
         </classes>
     </test>
-    <!--    <test name="Login" parallel="tests" thread-count="10">-->
-    <!--        <parameter name="browser" value="safari"/>-->
-    <!--        <classes>-->
-    <!--            <class name="test.LoginTest" />-->
-    <!--        </classes>-->
-    <!--    </test>-->
 </suite>

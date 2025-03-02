@@ -28,4 +28,5 @@ public interface Language {
     String TXT_24 = "Thông tin đăng nhập không đúng";
     String TXT_25 = "Số điện thoại/email liên kết với tài khoản đã bị xóa. Vui lòng chọn số điện thoại/email khác.";
     String TXT_26 = "Thông tin đăng nhập không đúng";
+    String TXT_27 = "Đăng nhập";
 }

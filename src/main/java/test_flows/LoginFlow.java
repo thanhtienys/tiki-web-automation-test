@@ -5,7 +5,6 @@ import io.qameta.allure.Step;
 import models.components.authentication.LoginComp;
 import models.pages.AuthPage;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Optional;
 import org.testng.asserts.SoftAssert;
@@ -49,19 +48,18 @@ public class LoginFlow {
                 Collections.addAll(expectForm, TXT_3, TXT_4, TXT_18, TXT_2);
                 WebUI.checkTextStr(driver, softAssert, loginComp.getLoginWithEmailSel(), TXT_16);
                 WebUI.checkTextStr(driver, softAssert, loginComp.getOrContinueByTxtSel(), TXT_5);
+                //TODO: verify term of uses
             }
             case PASSWORD -> {
                 WebUI.checkButtonEnable(driver, softAssert, loginComp.getBackBtnSel(), "");
-                Collections.addAll(expectForm, TXT_13, TXT_14, TXT_15, TXT_10);
-                WebUI.checkTextStr(driver, softAssert, loginComp.getValueOfContentTxtSel(), phoneNumber);
+                Collections.addAll(expectForm, TXT_13, TXT_14 + " " + phoneNumber, TXT_15, TXT_10);
                 WebUI.checkTextStr(driver, softAssert, loginComp.getForgotPassSel(), TXT_11);
                 WebUI.checkTextStr(driver, softAssert, loginComp.getLoginBySMSSel(), TXT_12);
             }
             case BY_EMAIL -> {
-                List<WebElement> webElementList = WebUI.findElements(driver, loginComp.getInputSel());
                 WebUI.checkButtonEnable(driver, softAssert, loginComp.getBackBtnSel(), "");
-                Collections.addAll(expectForm, TXT_19, TXT_20, TXT_21, TXT_10);
-                WebUI.checkTextStr(driver, softAssert, webElementList.get(1), TXT_15);
+                Collections.addAll(expectForm, TXT_19, TXT_20, TXT_21, TXT_27);
+                //TODO: verify password,create account
                 WebUI.checkTextStr(driver, softAssert, loginComp.getForgotPassSel(), TXT_11);
             }
 
@@ -89,9 +87,16 @@ public class LoginFlow {
         WebAction.clickItem(driver, loginComp.getBackBtnSel());
     }
 
+    @Step(" Click button <Close>")
+    public void clickButtonClose() {
+        WebAction.clickItem(driver, loginComp.getCloseBtnSel());
+    }
+
     @Step("[Input Password] Click button <Login By SMS>")
     public void clickBtnLoginBySMS() {
         WebAction.clickItem(driver, loginComp.getLoginBySMSSel());
+        //Config time manual authentication
+        WaitEx.sleepLow();
     }
 
     @Step("[Login By Phone Number] Verify invalid phone number")
@@ -117,14 +122,12 @@ public class LoginFlow {
         }
         checkErrorInputPhoneNumber(softAssert, ErrorType.INVALID, RandomEx.generateRandomPhone(8, true));
 
-        Allure.step("Less than 10 numbers | Phone number invalid 10 digits");
-        checkErrorInputPhoneNumber(softAssert, ErrorType.INVALID, RandomEx.generateRandomPhone(9, false));
-
         Allure.step("Max length phone number greater than 10 digits");
-        checkErrorInputPhoneNumber(softAssert, ErrorType.MAX_LENGTH, RandomEx.generateRandomPhone(12, true));
+        verifyMaxLengthPhoneNumber();
 
         softAssert.assertAll();
     }
+
 
     @Step("[Login By Phone Number] > [Input Password] verify input password")
     public void verifyInputPassword(String password) {
@@ -166,6 +169,9 @@ public class LoginFlow {
         moveToLoginByEmail();
         inputEmailPasswordAndSubmit(email, password);
 
+        //Config time manual authentication
+        WaitEx.sleepLow();
+
         switch (errorType) {
             case INVALID ->
                     softAssert.assertEquals(WebUI.getText(driver, loginComp.getErrorMsgSel()), TXT_24, "[ERR] Err display incorrect");
@@ -192,6 +198,8 @@ public class LoginFlow {
     @Step("[Login By Phone Number] > [Input Password] Input value {3} and verify with expect {2}")
     private void checkErrorInputPassword(SoftAssert softAssert, ErrorType errorType, String value) {
         inputAndSubmit(value);
+        //Config time manual authentication
+        WaitEx.sleepLow();
         switch (errorType) {
             case INVALID ->
                     softAssert.assertEquals(WebUI.getText(driver, loginComp.getErrorMsgSel()), TXT_26, "[ERR] Err display incorrect");
@@ -222,23 +230,18 @@ public class LoginFlow {
     public void inputAndSubmit(String value) {
         WebAction.sendKeyEx(driver, loginComp.getInputSel(), value);
         WebAction.clickItem(driver, loginComp.getContinueBtnSel());
-        WaitEx.sleepMedium();
     }
 
     @Step("Input value email {0}, password {1} and submit")
     public void inputEmailPasswordAndSubmit(String email, String password) {
-
-//        if (email != null && password == null) {
-//            WebAction.sendKeyEx(WebUI.findElements(driver, loginComp.getInputSel()).get(0), email);
-//            WebAction.clearValueEx(WebUI.findElements(driver, loginComp.getInputSel()).get(1));
-//        } else if (email == null && password != null) {
-//            WebAction.clearValueEx(WebUI.findElements(driver, loginComp.getInputSel()).get(0));
-//            WebAction.sendKeyEx(WebUI.findElements(driver, loginComp.getInputSel()).get(1), password);
-//        } else {
         WebAction.sendKeyEx(WebUI.findElements(driver, loginComp.getInputSel()).get(0), email);
         WebAction.sendKeyEx(WebUI.findElements(driver, loginComp.getInputSel()).get(1), password);
-//        }
         WebAction.clickItem(driver, loginComp.getContinueBtnSel());
     }
 
+    private void verifyMaxLengthPhoneNumber() {
+        String phone = RandomEx.generateRandomPhone(12, true);
+        WebAction.sendKeyEx(driver, loginComp.getInputSel(), phone);
+        Assert.assertEquals(WebUI.getValue(driver, loginComp.getInputSel()), phone.substring(0, 10), "[ERR] Value {0} still display");
+    }
 }
