@@ -1,0 +1,2 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","74837","Test Login By Phone Number","Overview","Sun Mar 02 21:00:25 GMT+07:00 2025","failed","Sun Mar 02 21:01:40 GMT+07:00 2025","test.LoginTest","Login","test.LoginTest","testLoginByPhoneNumber"
